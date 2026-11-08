@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="ru" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AppSpace — Платформа игр, приложений и разработчиков</title>
+    <link rel="stylesheet" href="./src/output.css">
+    <link rel="shortcut icon" href="./img/image.png" type="image/x-icon">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            500: '#8b5cf6',
+                            600: '#7c3aed',
+                            700: '#6d28d9',
+                        }
+                    },
+                    animation: {
+                        'pulse-glow': 'pulseGlow 3s infinite alternate',
+                        'float': 'float 4s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        pulseGlow: {
+                            '0%': { filter: 'drop-shadow(0 0 15px rgba(139, 92, 246, 0.4))' },
+                            '100%': { filter: 'drop-shadow(0 0 35px rgba(236, 72, 153, 0.8))' }
+                        },
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0px)' },
+                            '50%': { transform: 'translateY(-6px)' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        #cursor-glow {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 600px;
+            height: 600px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(139, 92, 246, 0.12) 0%, rgba(236, 72, 153, 0.04) 40%, transparent 70%);
+            pointer-events: none;
+            transform: translate(-50%, -50%);
+            transition: width 0.3s, height 0.3s;
+            z-index: 0;
+        }
+
+        .logo-glow {
+            background: linear-gradient(135deg, #a855f7, #ec4899, #3b82f6);
+            background-size: 200% 200%;
+            animation: gradientShift 4s ease infinite;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 dark:bg-slate-950 dark:text-slate-100 bg-slate-50 text-slate-900 min-h-screen flex flex-col selection:bg-purple-500 selection:text-white relative overflow-x-hidden transition-colors duration-300">
+
+    <!-- Интерактивный фон (подсветка за курсором) -->
+    <div id="cursor-glow"></div>
+
+    <!-- Шапка сайта -->
+    <header class="sticky top-0 z-50 backdrop-blur-md bg-slate-950/75 dark:bg-slate-950/75 bg-white/75 border-b border-slate-800/80 dark:border-slate-800/80 border-slate-200 transition-colors">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
+            
+            <!-- Логотип -->
+            <a href="#" class="flex items-center gap-3 group shrink-0">
+                <div class="relative w-12 h-12 flex items-center justify-center bg-slate-900 border border-purple-500/30 rounded-2xl group-hover:border-purple-500 transition-all duration-300 animate-pulse-glow shadow-lg shadow-purple-500/20">
+                    <i data-lucide="rocket" class="w-6 h-6 text-purple-400 group-hover:scale-110 transition-transform duration-300 animate-float"></i>
+                </div>
+                <div class="flex flex-col">
+                    <span class="text-2xl font-black tracking-wider logo-glow">AppSpace</span>
+                    <span class="text-[10px] text-slate-400 -mt-1 font-semibold uppercase tracking-widest">Global Store</span>
+                </div>
+            </a>
+
+            <!-- Поиск -->
+            <div class="hidden md:flex items-center relative flex-1 max-w-md">
+                <i data-lucide="search" class="w-5 h-5 absolute left-3 text-slate-400"></i>
+                <input type="text" id="search-input" placeholder="Поиск среди сотен игр и приложений..." 
+                       class="w-full bg-slate-900/90 dark:bg-slate-900/90 bg-slate-100 border border-slate-800 dark:border-slate-800 border-slate-300 rounded-xl py-2 pl-10 pr-4 text-sm text-slate-200 dark:text-slate-200 text-slate-800 placeholder-slate-500 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all">
+            </div>
+
+            <!-- Действия и переключатели -->
+            <div class="flex items-center gap-3">
+                <!-- Кнопка смены темы -->
+                <button onclick="toggleTheme()" class="p-2.5 bg-slate-900 dark:bg-slate-900 bg-slate-200 hover:bg-slate-800 border border-slate-800 dark:border-slate-800 border-slate-300 rounded-xl transition text-slate-300 dark:text-slate-300 text-slate-700" title="Сменить тему">
+                    <i data-lucide="sun" id="theme-icon-sun" class="w-5 h-5 hidden dark:block"></i>
+                    <i data-lucide="moon" id="theme-icon-moon" class="w-5 h-5 block dark:hidden"></i>
+                </button>
+
+                <!-- Загрузить свое приложение -->
+                <button onclick="openUploadModal()" class="hidden sm:flex items-center gap-2 px-4 py-2.5 bg-slate-900 dark:bg-slate-900 bg-slate-200 hover:bg-slate-800 border border-slate-800 dark:border-slate-800 border-slate-300 rounded-xl text-sm font-medium transition text-slate-200 dark:text-slate-200 text-slate-800">
+                    <i data-lucide="upload-cloud" class="w-4 h-4 text-purple-400"></i>
+                    <span>Опубликовать</span>
+                </button>
+
+                <!-- Кнопка Входа / Профиль -->
+                <div id="auth-container">
+                    <button onclick="openAuthModal()" class="px-5 py-2.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-medium rounded-xl transition shadow-lg shadow-purple-600/25 active:scale-95 text-sm">
+                        Войти
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Основной контент -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-10 z-10">
+        
+        <!-- Баннер -->
+        <section class="relative rounded-3xl overflow-hidden mb-12 border border-slate-800 bg-gradient-to-r from-purple-900/40 via-indigo-950/60 to-slate-900/60 p-8 sm:p-12 shadow-2xl">
+            <div class="max-w-2xl relative z-10">
+                <span class="px-3 py-1 bg-purple-500/10 border border-purple-500/20 text-purple-400 rounded-full text-xs font-semibold uppercase tracking-wider">Экосистема 2026</span>
+                <h1 class="text-4xl sm:text-5xl font-extrabold mt-4 mb-4 leading-tight">Лучшие игры и приложения с честной статистикой</h1>
+                <p class="text-slate-400 text-base sm:text-lg mb-6">Загружайте проверенный софт, играйте в браузере или публикуйте собственные проекты на суд миллионов пользователей.</p>
+                <div class="flex flex-wrap gap-4">
+                    <a href="#catalog" class="px-6 py-3 bg-white text-slate-950 font-bold rounded-xl hover:bg-slate-200 transition shadow-lg">Смотреть топ-каталог</a>
+                    <button onclick="openUploadModal()" class="px-6 py-3 bg-purple-600/20 hover:bg-purple-600/30 border border-purple-500/40 text-purple-300 font-bold rounded-xl transition">Добавить своё</button>
+                </div>
+            </div>
+            <div class="absolute right-0 top-0 bottom-0 w-1/2 opacity-30 md:opacity-50 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-purple-500 via-pink-500 to-transparent pointer-events-none"></div>
+        </section>
+
+        <!-- Навигация и категории (Включая реальный Топ) -->
+        <div id="catalog" class="flex items-center justify-between mb-8 flex-wrap gap-4 border-b border-slate-800/80 pb-4">
+            <div class="flex items-center gap-3">
+                <h2 class="text-2xl font-bold tracking-tight">Каталог</h2>
+                <span class="text-xs px-2.5 py-1 bg-purple-500/10 text-purple-400 border border-purple-500/20 rounded-full font-semibold">Реальные данные</span>
+            </div>
+            
+            <div class="flex items-center gap-2 bg-slate-900/80 dark:bg-slate-900/80 bg-slate-200 p-1.5 rounded-2xl border border-slate-800/80 text-sm overflow-x-auto">
+                <button onclick="filterCategory('all')" class="category-btn active px-4 py-2 rounded-xl font-medium transition bg-purple-600 text-white shrink-0">Все</button>
+                <button onclick="filterCategory('top')" class="category-btn px-4 py-2 rounded-xl font-medium text-slate-400 hover:text-white transition shrink-0 flex items-center gap-1.5"><i data-lucide="flame" class="w-4 h-4 text-orange-400"></i>Топ недели</button>
+                <button onclick="filterCategory('game')" class="category-btn px-4 py-2 rounded-xl font-medium text-slate-400 hover:text-white transition shrink-0">Игры</button>
+                <button onclick="filterCategory('app')" class="category-btn px-4 py-2 rounded-xl font-medium text-slate-400 hover:text-white transition shrink-0">Приложения</button>
+            </div>
+        </div>
+
+        <!-- Сетка карточек -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" id="app-grid">
+            <!-- Динамически заполняется из script.js -->
+        </div>
+    </main>
+
+    <!-- Подвал -->
+    <footer class="border-t border-slate-800/80 bg-slate-950/80 dark:bg-slate-950/80 bg-white py-8 z-10 transition-colors">
+        <div class="max-w-7xl mx-auto px-4 text-center text-slate-500 text-sm flex flex-col sm:flex-row items-center justify-between gap-4">
+            <p>© 2026 AppSpace Store. Все права защищены.</p>
+            <div class="flex gap-6 text-xs text-slate-400">
+                <a href="#" class="hover:text-purple-400 transition">Конфиденциальность</a>
+                <a href="#" class="hover:text-purple-400 transition">Условия использования</a>
+                <a href="#" class="hover:text-purple-400 transition">Поддержка разработчиков</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Модальное окно: Авторизация (Google / Apple) -->
+    <div id="auth-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-md w-full p-8 relative shadow-2xl">
+            <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white p-2">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+            
+            <div class="text-center mb-6">
+                <div class="w-14 h-14 bg-purple-500/10 text-purple-400 rounded-2xl flex items-center justify-center mx-auto mb-3 border border-purple-500/20">
+                    <i data-lucide="user-circle" class="w-8 h-8"></i>
+                </div>
+                <h3 class="text-2xl font-bold">Вход в AppSpace</h3>
+                <p class="text-slate-400 text-xs mt-1">Войдите, чтобы скачивать игры, оставлять отзывы и публиковать свой софт</p>
+            </div>
+
+            <div class="space-y-3">
+                <!-- Кнопка Google -->
+                <button onclick="socialLogin('Google')" class="w-full flex items-center justify-center gap-3 py-3 px-4 bg-slate-800/80 hover:bg-slate-800 border border-slate-700/60 rounded-xl font-medium text-sm transition text-white">
+                    <svg class="w-5 h-5" viewBox="0 0 24 24"><path fill="#EA4335" d="M12 5c1.6 0 3 .6 4.1 1.6l3.1-3.1C17.3 1.8 14.8 1 12 1 7.5 1 3.7 3.6 1.8 7.3l3.7 2.9C6.4 7.2 9 5 12 5z"/><path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.5h6.5c-.3 1.5-1.1 2.8-2.4 3.7l3.7 2.9c2.2-2 3.7-5 3.7-8.8z"/><path fill="#FBBC05" d="M5.5 10.2c-.2.7-.4 1.5-.4 2.3s.2 1.6.4 2.3L1.8 17.7C1 16.1.5 14.1.5 12s.5-4.1 1.3-5.7l3.7 3.9z"/><path fill="#34A853" d="M12 23c3.2 0 6-1.1 8-3l-3.7-2.9c-1.1.7-2.5 1.2-4.3 1.2-3 0-5.6-2.2-6.5-5.2L1.8 15C3.7 18.7 7.5 23 12 23z"/></svg>
+                    <span>Войти через Google аккаунт</span>
+                </button>
+
+                <!-- Кнопка Apple -->
+                <button onclick="socialLogin('Apple')" class="w-full flex items-center justify-center gap-3 py-3 px-4 bg-black hover:bg-slate-900 border border-slate-800 rounded-xl font-medium text-sm transition text-white">
+                    <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.98 6.27c.62-.75 1.04-1.79.93-2.83-.92.04-2.03.62-2.69 1.37-.58.67-1.09 1.74-.95 2.76 1.03.08 2.09-.53 2.71-1.3z"/></svg>
+                    <span>Войти с помощью Apple ID</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно: Загрузка своей игры / приложения -->
+    <div id="upload-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden overflow-y-auto">
+        <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-lg w-full p-8 relative shadow-2xl my-8">
+            <button onclick="closeUploadModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white p-2">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+            
+            <div class="mb-6">
+                <h3 class="text-2xl font-bold">Публикация проекта</h3>
+                <p class="text-slate-400 text-xs mt-1">Добавьте свою игру или приложение в глобальный каталог AppSpace</p>
+            </div>
+
+            <form id="upload-form" onsubmit="handleAppSubmission(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 mb-1.5">Название приложения / игры</label>
+                    <input type="text" id="up-title" required placeholder="Например: Cyber Arena 3D" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-purple-500">
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-300 mb-1.5">Категория</label>
+                        <select id="up-category" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-purple-500">
+                            <option value="game">Игра</option>
+                            <option value="app">Приложение</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-300 mb-1.5">Тип доступа</label>
+                        <select id="up-type" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-purple-500">
+                            <option value="free">Бесплатно</option>
+                            <option value="paid">Платное (299 ₽)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 mb-1.5">Краткое описание</label>
+                    <textarea id="up-desc" rows="2" required placeholder="Расскажите, в чем суть вашего проекта..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-purple-500 resize-none"></textarea>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 mb-1.5">Ссылка на обложку (изображение)</label>
+                    <input type="url" id="up-cover" placeholder="https://example.com/image.jpg (или оставьте пустым для авто-градиента)" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-purple-500">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 mb-1.5">Ссылка на видео / трейлер (YouTube / MP4)</label>
+                    <input type="url" id="up-video" placeholder="https://youtube.com/watch?v=..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-purple-500">
+                </div>
+
+                <button type="submit" class="w-full py-3 bg-purple-600 hover:bg-purple-500 rounded-xl font-bold text-sm transition shadow-lg shadow-purple-600/30 text-white mt-2">
+                    Опубликовать проект
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Модальное окно детали игры/приложения (с видео и статистикой) -->
+    <div id="detail-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden overflow-y-auto">
+        <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-2xl w-full p-6 sm:p-8 relative shadow-2xl my-8">
+            <button onclick="closeDetailModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white p-2 z-10">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+            <div id="detail-content"></div>
+        </div>
+    </div>
+
+    <!-- Подключаем JavaScript файл -->
+    <script src="script.js"></script>
+</body>
+</html>
